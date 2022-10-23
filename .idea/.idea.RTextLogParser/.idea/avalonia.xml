@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="RTextLogParser.Gui/App.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+        <entry key="RTextLogParser.Gui/Views/CustomizationPanelView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+        <entry key="RTextLogParser.Gui/Views/LogListView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+        <entry key="RTextLogParser.Gui/Views/MainWindow.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+        <entry key="RTextLogParser.Gui/Views/SingularLogView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

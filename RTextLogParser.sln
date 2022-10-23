@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTextLogParser.Gui", "RTextLogParser.Gui\RTextLogParser.Gui.csproj", "{E1392360-0739-4E9F-8604-825D8CAF32DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTextLogParser.Library.Tests", "RTextLogParser.Library.Tests\RTextLogParser.Library.Tests.csproj", "{A3C7BA4B-5EE4-47DC-B752-AEDD0CE2026D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RTextLogParser.Library", "RTextLogParser.Library\RTextLogParser.Library.csproj", "{A1FEE597-92F4-4315-9375-F6DEF61523EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E1392360-0739-4E9F-8604-825D8CAF32DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1392360-0739-4E9F-8604-825D8CAF32DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1392360-0739-4E9F-8604-825D8CAF32DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1392360-0739-4E9F-8604-825D8CAF32DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3C7BA4B-5EE4-47DC-B752-AEDD0CE2026D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3C7BA4B-5EE4-47DC-B752-AEDD0CE2026D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3C7BA4B-5EE4-47DC-B752-AEDD0CE2026D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3C7BA4B-5EE4-47DC-B752-AEDD0CE2026D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1FEE597-92F4-4315-9375-F6DEF61523EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1FEE597-92F4-4315-9375-F6DEF61523EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1FEE597-92F4-4315-9375-F6DEF61523EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1FEE597-92F4-4315-9375-F6DEF61523EC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
