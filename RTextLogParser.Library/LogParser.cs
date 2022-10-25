@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using RTextLogParser.Library.Exceptions;
 using RTextLogParser.Library.Utils;
 
 namespace RTextLogParser.Library;
@@ -15,6 +16,7 @@ public class LogParser
     
     private List<LogElement> _listOfSingularLogs = new List<LogElement>();
     private Regex _logRegex;
+    private Regex? _lastLogRegex;
     private string _logPath;
     private FileStream? _logFileStream; 
     private StringBuilder _readStringBuffer = new StringBuilder();
@@ -28,10 +30,11 @@ public class LogParser
     /// </summary>
     /// <param name="logPath">Path to log file</param>
     /// <param name="logRegex">Regex matching singular log</param>
-    public LogParser(string logPath, Regex logRegex)
+    public LogParser(string logPath, Regex logRegex, Regex? lastLogRegex = null)
     {
         _logRegex = logRegex;
         _logPath = logPath;
+        _lastLogRegex = lastLogRegex;
     }
 
     private void EnsureFileIsOpened()
@@ -41,22 +44,22 @@ public class LogParser
             FileOptions.Asynchronous);
     }
 
-    private void FindLogsInBuffer()
+    private void FindLogsInBuffer(bool useLastLogRegex = false)
     {
         int? lastCharacterOfAnyMatches = null;
         var buffer = _readStringBuffer.ToString();
-        foreach (Match match in _logRegex.Matches(buffer))
+        var regex = useLastLogRegex ? _lastLogRegex ?? _logRegex : _logRegex;
+        foreach (Match match in regex.Matches(buffer))
         {
             if (match.Success)
             {
                 var lastMatchGroup = match.Groups[match.Groups.Count - 1];
                 var thisMatchStartIndex = match.Groups[0].Index;
                 lastCharacterOfAnyMatches = lastMatchGroup.Index + lastMatchGroup.Length;
-                Debug.Assert((lastCharacterOfAnyMatches - thisMatchStartIndex) <= match.Value.Length, 
-                    $"Length of match '{match.Value}' is smaller than last group end index {lastCharacterOfAnyMatches - thisMatchStartIndex}");
-                // _listOfSingularLogs.Add(match.Value.Substring(0, lastCharacterOfAnyMatches.Value - thisMatchStartIndex));
+                if ((lastCharacterOfAnyMatches - thisMatchStartIndex) <= match.Value.Length)
+                    throw new InvalidRegexException($"Matched string length was smaller, than last matched group. This can happen, if you do capturing group inside lookaheads. Please rewrite regex, so that no matching group is inside lookaheads. Matched string: '{match.Value}', matched group: '{match.Groups[match.Groups.Count - 1].Value}'");
                 var value = match.Value.Substring(0, lastCharacterOfAnyMatches.Value - thisMatchStartIndex);
-                _listOfSingularLogs.Add(new LogElement(value, ));
+                _listOfSingularLogs.Add(new LogElement(value, match.Groups.Cast<Group>().Skip(1).Select(group => group.Value)));
             }
         }
 
@@ -85,8 +88,7 @@ public class LogParser
 
         if (lastReadBytesCount == 0 && _readStringBuffer.Length > 0)
         {
-            _listOfSingularLogs.Add(_readStringBuffer.ToString().Trim());
-            _readStringBuffer.Clear();
+            FindLogsInBuffer(true);
             _didEncounterEoF = true;
         }
     }
@@ -111,7 +113,7 @@ public class LogParser
     /// </summary>
     /// <param name="cancellationToken">Cancellation of reading the file</param>
     /// <returns>Log or null in case of end of file or cancellation token request</returns>
-    public async Task<string?> ReadNextLogAsync(CancellationToken? cancellationToken = null)
+    public async Task<LogElement?> ReadNextLogAsync(CancellationToken? cancellationToken = null)
     {
         if (_returnedLogLines <= _listOfSingularLogs.Count && !_didEncounterEoF)
             await ReadFileAsync(true, cancellationToken);
@@ -133,7 +135,7 @@ public class LogParser
         _returnedLogLines = 0;
     }
 
-    public async IAsyncEnumerable<string> GetLogsAsync(CancellationToken? cancellationToken = null)
+    public async IAsyncEnumerable<LogElement> GetLogsAsync(CancellationToken? cancellationToken = null)
     {
         ReadFromBeginning();
         
