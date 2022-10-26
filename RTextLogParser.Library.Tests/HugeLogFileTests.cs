@@ -13,7 +13,8 @@ public class HugeLogFileTests
         Directory.GetParent(Environment.CurrentDirectory)!.Parent!.Parent!.FullName;
     private static string DataPath => Path.Combine(ThisDirectoryPath, "Data");
     private static string HugeFileLogPath => Path.Combine(DataPath, "HugeLogFile", "HugeLogFile.txt");
-    private static readonly Regex LogRegex = new Regex(@"\[(.+?)\]\s*(\w+)\s*(.)(\s+)(.*?)(?=\r?\n\[)", RegexOptions.Singleline);
+    private static readonly Regex LogRegex =
+        new Regex(@"\[(.+?)\]\s*(\w+)\s*(.)(\s+)(.*?)(?=(?=\r?\n\[)|(?=\s*$))", RegexOptions.Singleline);
 
 
     public HugeLogFileTests()

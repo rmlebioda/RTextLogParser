@@ -16,7 +16,6 @@ public class SimpleLogTests
     private static string SimpleFileLogPath => Path.Combine(DataPath, "SimpleLogFile", "SimpleLogFile.txt");
 
     private static readonly Regex LogRegex =
-        //new Regex(@"\[(.+?)\]\s*(\w+)\s*(.)(\s+)(.*?)(?=\r?\n\[)", RegexOptions.Singleline);
         new Regex(@"\[(.+?)\]\s*(\w+)\s*(.)(\s+)(.*?)(?=(?=\r?\n\[)|$)", RegexOptions.Singleline);
 
     private const int LogRegexGroupCount = 5;

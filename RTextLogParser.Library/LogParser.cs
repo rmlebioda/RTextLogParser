@@ -13,12 +13,12 @@ namespace RTextLogParser.Library;
 public class LogParser
 {
     private const int BufferSize = 4096;
-    
+
     private List<LogElement> _listOfSingularLogs = new List<LogElement>();
     private Regex _logRegex;
     private Regex? _lastLogRegex;
     private string _logPath;
-    private FileStream? _logFileStream; 
+    private FileStream? _logFileStream;
     private StringBuilder _readStringBuffer = new StringBuilder();
     private readonly byte[] _buffer = new byte[BufferSize];
     private Encoding? _fileEncoding;
@@ -57,9 +57,11 @@ public class LogParser
                 var thisMatchStartIndex = match.Groups[0].Index;
                 lastCharacterOfAnyMatches = lastMatchGroup.Index + lastMatchGroup.Length;
                 if ((lastCharacterOfAnyMatches - thisMatchStartIndex) > match.Value.Length)
-                    throw new InvalidRegexException($"Matched string length was smaller, than last matched group. This can happen, if you do capturing group inside lookaheads. Please rewrite regex, so that no matching group is inside lookaheads. Matched string: '{match.Value}', matched last group: '{match.Groups[match.Groups.Count - 1].Value}' at position {lastMatchGroup.Index}.");
+                    throw new InvalidRegexException(
+                        $"Matched string length was smaller, than last matched group. This can happen, if you do capturing group inside lookaheads. Please rewrite regex, so that no matching group is inside lookaheads. Matched string: '{match.Value}', matched last group: '{match.Groups[match.Groups.Count - 1].Value}' at position {lastMatchGroup.Index}.");
                 var value = match.Value.Substring(0, lastCharacterOfAnyMatches.Value - thisMatchStartIndex);
-                _listOfSingularLogs.Add(new LogElement(value, match.Groups.Cast<Group>().Skip(1).Select(group => group.Value)));
+                _listOfSingularLogs.Add(new LogElement(value,
+                    match.Groups.Cast<Group>().Skip(1).Select(group => group.Value)));
             }
         }
 
@@ -69,7 +71,7 @@ public class LogParser
             _readStringBuffer.Append(buffer.Substring(lastCharacterOfAnyMatches.Value));
         }
     }
-    
+
     private async Task ReadFileAsync(bool firstMatchOnly, CancellationToken? cancellationToken = null)
     {
         EnsureFileIsOpened();
@@ -102,8 +104,8 @@ public class LogParser
     {
         if (!_didEncounterEoF)
             await ReadFileAsync(false, cancellationToken);
-        
-        return cancellationToken is {IsCancellationRequested: true}
+
+        return cancellationToken is { IsCancellationRequested: true }
             ? null
             : _listOfSingularLogs.Count;
     }
@@ -117,7 +119,7 @@ public class LogParser
     {
         if (_returnedLogLines <= _listOfSingularLogs.Count && !_didEncounterEoF)
             await ReadFileAsync(true, cancellationToken);
-        
+
         if (cancellationToken?.IsCancellationRequested != true && _listOfSingularLogs.Count > _returnedLogLines)
         {
             _returnedLogLines++;
@@ -138,7 +140,7 @@ public class LogParser
     public async IAsyncEnumerable<LogElement> GetLogsAsync(CancellationToken? cancellationToken = null)
     {
         ReadFromBeginning();
-        
+
         while (true)
         {
             var log = await ReadNextLogAsync(cancellationToken);
@@ -146,7 +148,7 @@ public class LogParser
                 break;
 
             yield return log;
-            
+
             if (cancellationToken?.IsCancellationRequested == true)
                 break;
         }
