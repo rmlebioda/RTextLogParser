@@ -45,8 +45,8 @@ public class HugeLogFileTests
     [Test]
     public async Task ShouldReadFirstThreeLogs()
     {
-        Assert.AreEqual("[2020-05-06T00:00:00.000000] WARNING |  Another test message", await _parser.ReadNextLogAsync());
-        Assert.AreEqual("[2020-05-06T00:00:26.801288] ERROR   |  Duis aute irure dolor in reprehenderit in voluptate", await _parser.ReadNextLogAsync());
-        Assert.AreEqual("[2020-05-06T00:00:27.840942] WARNING |  Pariatur nesciunt velit est. Molestias et a voluptatem quam est", await _parser.ReadNextLogAsync());
+        Assert.AreEqual("[2020-05-06T00:00:00.000000] WARNING |  Another test message", (await _parser.ReadNextLogAsync())!.Log);
+        Assert.AreEqual("[2020-05-06T00:00:26.801288] ERROR   |  Duis aute irure dolor in reprehenderit in voluptate", (await _parser.ReadNextLogAsync())!.Log);
+        Assert.AreEqual("[2020-05-06T00:00:27.840942] WARNING |  Pariatur nesciunt velit est. Molestias et a voluptatem quam est", (await _parser.ReadNextLogAsync())!.Log);
     }
 }

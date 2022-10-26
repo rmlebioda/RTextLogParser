@@ -56,8 +56,8 @@ public class LogParser
                 var lastMatchGroup = match.Groups[match.Groups.Count - 1];
                 var thisMatchStartIndex = match.Groups[0].Index;
                 lastCharacterOfAnyMatches = lastMatchGroup.Index + lastMatchGroup.Length;
-                if ((lastCharacterOfAnyMatches - thisMatchStartIndex) <= match.Value.Length)
-                    throw new InvalidRegexException($"Matched string length was smaller, than last matched group. This can happen, if you do capturing group inside lookaheads. Please rewrite regex, so that no matching group is inside lookaheads. Matched string: '{match.Value}', matched group: '{match.Groups[match.Groups.Count - 1].Value}'");
+                if ((lastCharacterOfAnyMatches - thisMatchStartIndex) > match.Value.Length)
+                    throw new InvalidRegexException($"Matched string length was smaller, than last matched group. This can happen, if you do capturing group inside lookaheads. Please rewrite regex, so that no matching group is inside lookaheads. Matched string: '{match.Value}', matched last group: '{match.Groups[match.Groups.Count - 1].Value}' at position {lastMatchGroup.Index}.");
                 var value = match.Value.Substring(0, lastCharacterOfAnyMatches.Value - thisMatchStartIndex);
                 _listOfSingularLogs.Add(new LogElement(value, match.Groups.Cast<Group>().Skip(1).Select(group => group.Value)));
             }
