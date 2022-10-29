@@ -18,12 +18,14 @@ public class CustomizationPanelViewModel : ViewModelBase
             throw new ApplicationException("Parameterless constructor of this ViewModel should be called only by designer");
         _windowActions = new MainWindowActions(() => Task.CompletedTask);
         ChosenFileCommand = ReactiveCommand.CreateFromTask(_windowActions.LoadFileAsync);
+        ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
     }
 
     public CustomizationPanelViewModel(MainWindowActions windowActions)
     {
         _windowActions = windowActions;
         ChosenFileCommand = ReactiveCommand.CreateFromTask(_windowActions.LoadFileAsync);
+        ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
     }
 
     internal void UpdateFilePath(string path)
@@ -43,4 +45,7 @@ public class CustomizationPanelViewModel : ViewModelBase
     }
 
     public string SettingsText => "Settings";
+    
+    private readonly ObservableAsPropertyHelper<bool> _isBusy;
+    public bool IsBusy => _isBusy.Value;
 }

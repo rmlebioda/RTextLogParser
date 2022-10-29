@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:RTextLogParser.Gui.ViewModels"
+             xmlns:v="using:RTextLogParser.Gui.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="RTextLogParser.Gui.Views.LogListView"
              >
@@ -12,5 +13,12 @@
     </Design.DataContext>
     
     <ScrollViewer>
+        <ItemsControl Items="{Binding LogsViewModels}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <v:SingularLogView />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </ScrollViewer>
 </UserControl>

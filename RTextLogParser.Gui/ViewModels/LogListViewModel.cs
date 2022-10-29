@@ -21,7 +21,7 @@ public class LogListViewModel
         var parser = new LogParser(filePath, LogRegex);
         await foreach (var log in parser.GetLogsAsync())
         {
-            LogsViewModels.Add(new SingularLogViewModel());
+            LogsViewModels.Add(new SingularLogViewModel(log));
         }
     }
 }

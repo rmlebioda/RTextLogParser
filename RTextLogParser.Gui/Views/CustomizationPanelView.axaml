@@ -4,19 +4,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:RTextLogParser.Gui.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="40"
-             x:Class="RTextLogParser.Gui.Views.CustomizationPanelView"
-             >
+             x:Class="RTextLogParser.Gui.Views.CustomizationPanelView">
 
     <Design.DataContext>
         <vm:CustomizationPanelViewModel />
     </Design.DataContext>
 
-    <Grid Margin="0 0 0 0" ColumnDefinitions="Auto,*,Auto">
-        <Button Grid.Column="0" Content="{Binding ChooseLogFileText}" Command="{Binding ChosenFileCommand}" />
-        <Label Grid.Column="1">
-            <TextBlock HorizontalAlignment="Stretch" Text="{Binding SelectedFile}" VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis" />
-        </Label>
-        <Button Grid.Column="2" Content="{Binding SettingsText}" DockPanel.Dock="Right" />
-    </Grid>
+    <StackPanel Margin="0 0 0 0">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Button Grid.Column="0" Content="{Binding ChooseLogFileText}" Command="{Binding ChosenFileCommand}" />
+            <Label Grid.Column="1">
+                <TextBlock HorizontalAlignment="Stretch" Text="{Binding SelectedFile}" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" />
+            </Label>
+            <Button Grid.Column="2" Content="{Binding SettingsText}" DockPanel.Dock="Right" />
+        </Grid>
+        <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+    </StackPanel>
 </UserControl>
