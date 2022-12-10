@@ -5,7 +5,7 @@ using RTextLogParser.Library;
 
 namespace RTextLogParser.Gui.ViewModels;
 
-public class LogListViewModel
+public class LogListViewModel : ViewModelBase
 {
     public ObservableCollection<SingularLogViewModel> LogsViewModels { get; } = new ObservableCollection<SingularLogViewModel>();
 

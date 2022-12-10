@@ -21,12 +21,13 @@ public class SingularLogViewModel : ViewModelBase
 
     public void ToggledExpandLog()
     {
-        LogMaxLines = _logMaxLines == NonExpandedMaxLines ? 0 : NonExpandedMaxLines;
+        LogMaxLines = _logMaxLines == MaxLinesNonExpanded ? MaxLinesNoLimit : MaxLinesNonExpanded;
     }
 
     public string Log => _logElement.Log;
-    private const int NonExpandedMaxLines = 1;
-    private int _logMaxLines = NonExpandedMaxLines;
+    private const int MaxLinesNonExpanded = 1;
+    private const int MaxLinesNoLimit = 0;
+    private int _logMaxLines = MaxLinesNonExpanded;
 
     public int LogMaxLines
     {
@@ -38,5 +39,5 @@ public class SingularLogViewModel : ViewModelBase
         }
     }
 
-    public bool IsExpanded => LogMaxLines == NonExpandedMaxLines;
+    public bool IsExpanded => LogMaxLines > 1 && LogMaxLines == MaxLinesNonExpanded;
 }
