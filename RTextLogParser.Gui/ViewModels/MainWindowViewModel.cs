@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using RTextLogParser.Gui.Models;
@@ -20,22 +21,30 @@ public class MainWindowViewModel : ViewModelBase
         if (!Design.IsDesignMode)
             throw new ApplicationException("Parameterless constructor of this ViewModel should be called only by designer");
         _mainWindow = new MainWindow();
-        _windowActions = new MainWindowActions(LoadFileAsync);
+        _windowActions = new MainWindowActions(LoadFileAsync, CancelLoadingFile);
         CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
     }
 
     public MainWindowViewModel(MainWindow mainWindow)
     {
         _mainWindow = mainWindow;
-        _windowActions = new MainWindowActions(LoadFileAsync);
+        _windowActions = new MainWindowActions(LoadFileAsync, CancelLoadingFile);
         CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
     }
 
     public CustomizationPanelViewModel CustomizationPanelViewModel { get; }
     public LogListViewModel LogListViewModel { get; } = new LogListViewModel();
+    private CancellationTokenSource? _cancellationTokenSource;
 
+    private void CancelLoadingFile()
+    {
+        Log.Information("Sending cancellation to loading file procedure");
+        _cancellationTokenSource?.Cancel();
+    }
+    
     private async Task LoadFileAsync()
     {
+        _cancellationTokenSource = new CancellationTokenSource();
         Log.Information("Selecting new file");
         var newDialog = new OpenFileDialog
         {
@@ -52,7 +61,7 @@ public class MainWindowViewModel : ViewModelBase
                 Log.Information("Selected {filesCount} files: {filesArray}",
                     files.Length, string.Join(", ", files));
                 CustomizationPanelViewModel.UpdateFilePath(fileToLoad);
-                await LogListViewModel.LoadFileAsync(fileToLoad);
+                await LogListViewModel.LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
             }
             catch (Exception e)
             {

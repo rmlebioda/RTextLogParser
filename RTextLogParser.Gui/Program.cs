@@ -22,7 +22,7 @@ namespace RTextLogParser.Gui
             GC.KeepAlive(typeof(Avalonia.Svg.Skia.Svg).Assembly);
             
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
+                .MinimumLevel.Debug()
                 .WriteTo.Console()
                 .CreateLogger();
 

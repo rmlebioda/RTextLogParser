@@ -16,9 +16,10 @@ public class CustomizationPanelViewModel : ViewModelBase
     {
         if (!Design.IsDesignMode)
             throw new ApplicationException("Parameterless constructor of this ViewModel should be called only by designer");
-        _windowActions = new MainWindowActions(() => Task.CompletedTask);
+        _windowActions = new MainWindowActions(() => Task.CompletedTask, () => { });
         ChosenFileCommand = ReactiveCommand.CreateFromTask(_windowActions.LoadFileAsync);
         ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
+        StopLoading = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
     }
 
     public CustomizationPanelViewModel(MainWindowActions windowActions)
@@ -26,6 +27,7 @@ public class CustomizationPanelViewModel : ViewModelBase
         _windowActions = windowActions;
         ChosenFileCommand = ReactiveCommand.CreateFromTask(_windowActions.LoadFileAsync);
         ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
+        StopLoading = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
     }
 
     internal void UpdateFilePath(string path)
@@ -35,6 +37,7 @@ public class CustomizationPanelViewModel : ViewModelBase
     
     public string ChooseLogFileText => "Choose log file";
     public ReactiveCommand<Unit, Unit> ChosenFileCommand { get; }
+    public ReactiveCommand<Unit, Unit> StopLoading { get; }
     
     private string _selectedFile = string.Empty;
 
@@ -45,6 +48,7 @@ public class CustomizationPanelViewModel : ViewModelBase
     }
 
     public string SettingsText => "Settings";
+    public string StopText => "Stop";
     
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
     public bool IsBusy => _isBusy.Value;

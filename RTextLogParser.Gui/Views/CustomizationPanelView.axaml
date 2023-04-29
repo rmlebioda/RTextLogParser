@@ -11,13 +11,14 @@
     </Design.DataContext>
 
     <StackPanel Margin="0 0 0 0">
-        <Grid ColumnDefinitions="Auto,*,Auto">
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
             <Button Grid.Column="0" Content="{Binding ChooseLogFileText}" Command="{Binding ChosenFileCommand}" />
             <Label Grid.Column="1">
                 <TextBlock HorizontalAlignment="Stretch" Text="{Binding SelectedFile}" VerticalAlignment="Center"
                            TextTrimming="CharacterEllipsis" />
             </Label>
-            <Button Grid.Column="2" Content="{Binding SettingsText}" DockPanel.Dock="Right" />
+            <Button Grid.Column="2" Content="{Binding StopText}" DockPanel.Dock="Right" IsVisible="{Binding IsBusy}" Command="{Binding StopLoading}" />
+            <Button Grid.Column="3" Content="{Binding SettingsText}" DockPanel.Dock="Right" />
         </Grid>
         <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
     </StackPanel>
