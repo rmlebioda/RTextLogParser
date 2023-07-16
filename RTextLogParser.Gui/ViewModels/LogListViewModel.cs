@@ -36,8 +36,10 @@ public class LogListViewModel : ViewModelBase
         {
             Log.Debug("Elapsed {ElapsedMs} ms, adding {Elements} elements",
                 stopwatch!.ElapsedMilliseconds, logsVm.Count);
+            stopwatch.Restart();
             LogsViewModels.AddRange(logsVm!);
             logsVm!.Clear();
+            Log.Debug("Adding took {ElapsedMs} ms", stopwatch!.ElapsedMilliseconds);
             stopwatch.Restart();
         }
     }

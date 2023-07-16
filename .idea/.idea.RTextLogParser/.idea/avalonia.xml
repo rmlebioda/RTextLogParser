@@ -6,7 +6,9 @@
         <entry key="RTextLogParser.Gui/App.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
         <entry key="RTextLogParser.Gui/Views/CustomizationPanelView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
         <entry key="RTextLogParser.Gui/Views/LogListView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+        <entry key="RTextLogParser.Gui/Views/MainView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
         <entry key="RTextLogParser.Gui/Views/MainWindow.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+        <entry key="RTextLogParser.Gui/Views/SettingsView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
         <entry key="RTextLogParser.Gui/Views/SingularLogView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
       </map>
     </option>

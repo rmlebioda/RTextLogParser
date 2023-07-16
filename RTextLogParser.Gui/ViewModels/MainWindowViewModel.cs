@@ -1,78 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using RTextLogParser.Gui.Models;
+using System;
+using ReactiveUI;
+using RTextLogParser.Gui.DataPersistence;
 using RTextLogParser.Gui.Views;
-using Serilog;
 
 namespace RTextLogParser.Gui.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly MainWindow _mainWindow;
-    private readonly MainWindowActions _windowActions;
+    public AppState AppState { get; } = AppState.Retrieve();
+    public ViewModelBase? _currentPageViewModel;
 
-    public MainWindowViewModel()
+    public ViewModelBase? CurrentPageViewModel
     {
-        if (!Design.IsDesignMode)
-            throw new ApplicationException("Parameterless constructor of this ViewModel should be called only by designer");
-        _mainWindow = new MainWindow();
-        _windowActions = new MainWindowActions(LoadFileAsync, CancelLoadingFile);
-        CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
+        get => _currentPageViewModel;
+        set => this.RaiseAndSetIfChanged(ref _currentPageViewModel, value);
     }
 
+    [Obsolete("Do not call, to be used only by designer")]
+    /// <summary>
+    /// Do not call, to be used only by designer
+    /// </summary>
+    public MainWindowViewModel()
+    {
+        _mainWindow = new MainWindow();
+    }
+    
     public MainWindowViewModel(MainWindow mainWindow)
     {
         _mainWindow = mainWindow;
-        _windowActions = new MainWindowActions(LoadFileAsync, CancelLoadingFile);
-        CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
+        Initialize();
+        AppState.Retrieve().SetMainView(_mainWindow);
     }
 
-    public CustomizationPanelViewModel CustomizationPanelViewModel { get; }
-    public LogListViewModel LogListViewModel { get; } = new LogListViewModel();
-    private CancellationTokenSource? _cancellationTokenSource;
-
-    private void CancelLoadingFile()
+    private void Initialize()
     {
-        Log.Information("Sending cancellation to loading file procedure");
-        _cancellationTokenSource?.Cancel();
+        AppState.CurrentViewModelChanged += CurrentViewModelChanged;
     }
-    
-    private async Task LoadFileAsync()
+
+    private void CurrentViewModelChanged(ViewModelBase newViewModel)
     {
-        _cancellationTokenSource = new CancellationTokenSource();
-        Log.Information("Selecting new file");
-        var newDialog = new OpenFileDialog
-        {
-            AllowMultiple = false,
-            Title = "Select log file"
-        };
-        var files = await newDialog.ShowAsync(_mainWindow);
-        if (files is { Length: > 0 })
-        {
-            var fileToLoad = files.First();
-            try
-            {
-                Debug.Assert(files.Length == 1, "Expected only one file selected");
-                Log.Information("Selected {filesCount} files: {filesArray}",
-                    files.Length, string.Join(", ", files));
-                CustomizationPanelViewModel.UpdateFilePath(fileToLoad);
-                await LogListViewModel.LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
-            }
-            catch (Exception e)
-            {
-                Log.Error("Failed to load file {filePath} because of error: {e}", 
-                    fileToLoad, e.ToString());
-                throw;
-            }
-        }
-        else
-        {
-            Log.Information("File was not selected");
-        }
+        CurrentPageViewModel = newViewModel;
     }
 }
