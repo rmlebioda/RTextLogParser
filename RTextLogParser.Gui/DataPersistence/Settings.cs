@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ReactiveUI;
 using Serilog;
 
@@ -8,4 +9,5 @@ public class Settings
     internal readonly static bool IsDarkModeDefault = true;
     public string LookupRegex { get; set; } = string.Empty;
     public bool DarkMode { get; set; } = IsDarkModeDefault;
+    public List<RegexGroupDefinition> RegexGroups { get; set; } = new();
 }

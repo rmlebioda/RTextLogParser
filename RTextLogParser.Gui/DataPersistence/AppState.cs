@@ -11,8 +11,18 @@ namespace RTextLogParser.Gui.DataPersistence;
 public class AppState
 {
     #region Persistence fields
-    [DataMember] public Settings? Settings = null;
+    [DataMember] private Settings? _settings = null;
     #endregion
+
+    public Settings? Settings
+    {
+        get => _settings;
+        set
+        {
+            _settings = value;
+            SettingsChanged?.Invoke(_settings);
+        }
+    }
 
     public bool AreSettingsSet => Settings != null;
 
@@ -39,8 +49,10 @@ public class AppState
     private MainWindow? _mainWindow;
     private SettingsViewModel? _settingsViewModel;
 
-    public delegate void CurrentViewModelChange(ViewModelBase newViewModel);
+    public delegate void CurrentViewModelChange(ViewModelBase? newViewModel);
     public event CurrentViewModelChange CurrentViewModelChanged;
+    public delegate void SettingsChange(Settings? newSettings);
+    public event SettingsChange SettingsChanged;
     
     public MainViewModel SetMainView(MainWindow mainWindow)
     {

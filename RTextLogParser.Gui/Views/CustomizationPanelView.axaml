@@ -12,7 +12,7 @@
 
     <StackPanel Margin="0 0 0 0">
         <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-            <Button Grid.Column="0" Content="{Binding ChooseLogFileText}" Command="{Binding ChosenFileCommand}" IsEnabled="{Binding AppState.AreSettingsSet}" />
+            <Button Grid.Column="0" Content="{Binding ChooseLogFileText}" Command="{Binding ChosenFileCommand}" IsEnabled="{Binding AreSettingsSet}" />
             <Label Grid.Column="1">
                 <TextBlock HorizontalAlignment="Stretch" Text="{Binding SelectedFile}" VerticalAlignment="Center"
                            TextTrimming="CharacterEllipsis" />

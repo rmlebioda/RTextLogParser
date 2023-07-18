@@ -5,7 +5,7 @@ using RTextLogParser.Gui.Views;
 
 namespace RTextLogParser.Gui.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase
+public class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly MainWindow _mainWindow;
     public AppState AppState { get; } = AppState.Retrieve();
@@ -38,8 +38,13 @@ public class MainWindowViewModel : ViewModelBase
         AppState.CurrentViewModelChanged += CurrentViewModelChanged;
     }
 
-    private void CurrentViewModelChanged(ViewModelBase newViewModel)
+    private void CurrentViewModelChanged(ViewModelBase? newViewModel)
     {
         CurrentPageViewModel = newViewModel;
+    }
+
+    public void Dispose()
+    {
+        AppState.CurrentViewModelChanged -= CurrentViewModelChanged;
     }
 }

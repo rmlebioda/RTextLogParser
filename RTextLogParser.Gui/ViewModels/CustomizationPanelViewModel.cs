@@ -1,7 +1,6 @@
 using System;
 using System.Reactive;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Avalonia.Controls;
 using ReactiveUI;
 using RTextLogParser.Gui.DataPersistence;
@@ -9,10 +8,9 @@ using RTextLogParser.Gui.Models;
 
 namespace RTextLogParser.Gui.ViewModels;
 
-public class CustomizationPanelViewModel : ViewModelBase
+public class CustomizationPanelViewModel : ViewModelBase, IDisposable
 {
     private readonly MainWindowActions _windowActions;
-    public AppState AppState { get; }
 
     public CustomizationPanelViewModel()
     {
@@ -23,7 +21,7 @@ public class CustomizationPanelViewModel : ViewModelBase
         ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
         SettingsCommand = ReactiveCommand.Create(RunSettings);
         StopLoading = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
-        AppState = new AppState();
+        Initialize();
     }
 
     public CustomizationPanelViewModel(MainWindowActions windowActions)
@@ -33,7 +31,13 @@ public class CustomizationPanelViewModel : ViewModelBase
         ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
         SettingsCommand = ReactiveCommand.Create(RunSettings);
         StopLoading = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
-        AppState = AppState.Retrieve();
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        AppState.Retrieve().SettingsChanged += SettingsChanged;
+        SettingsChanged(AppState.Retrieve().Settings);
     }
 
     internal void UpdateFilePath(string path)
@@ -64,4 +68,16 @@ public class CustomizationPanelViewModel : ViewModelBase
     
     private readonly ObservableAsPropertyHelper<bool> _isBusy;
     public bool IsBusy => _isBusy.Value;
+    
+    public bool AreSettingsSet { get; set; }
+
+    public void SettingsChanged(Settings? settings)
+    {
+        AreSettingsSet = settings is not null;
+    }
+    
+    public void Dispose()
+    {
+        AppState.Retrieve().SettingsChanged -= SettingsChanged;
+    }
 }

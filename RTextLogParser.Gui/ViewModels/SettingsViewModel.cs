@@ -1,5 +1,9 @@
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using Avalonia.Interactivity;
 using Newtonsoft.Json;
 using ReactiveUI;
@@ -18,13 +22,59 @@ public class SettingsViewModel : ViewModelBase
     public string ThemeText { get; init; } = "Theme:";
     public string LightText { get; init; } = "Light";
     public string DarkText { get; init; } = "Dark";
+    public string RegexGroupsTitle { get; init; } = "Regular expression groups definition";
+    public string AddRegexGroupText { get; init; } = "Add new group";
+    public string DeleteSelectedRegexGroupText { get; init; } = "Delete selected group";
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
     public ReactiveCommand<Unit, Unit> CustomFileLoggerCommand { get; }
     public ReactiveCommand<Unit, Unit> LightModeCommand { get; }
     public ReactiveCommand<Unit, Unit> DarkModeCommand { get; }
+    public ReactiveCommand<Unit, Unit> AddNewRegexGroupCommand { get; }
+    public ReactiveCommand<Unit, Unit> DeleteSelectedRegexGroupCommand { get; }
 
-    private Settings CurrentSettings { get; set; }
+    private Settings _currentSettings { get; set; }
+
+    private Settings CurrentSettings
+    {
+        get => _currentSettings;
+        set
+        {
+            _currentSettings = value;
+            LookupRegex = _currentSettings.LookupRegex;
+            RegexGroups = new ObservableCollection<RegexGroupDefinition>(_currentSettings.RegexGroups);
+        }
+    }
+
+    public string LookupRegex
+    {
+        get => CurrentSettings.LookupRegex;
+        set
+        {
+            CurrentSettings.LookupRegex = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    private ObservableCollection<RegexGroupDefinition> _regexGroups;
+    public ObservableCollection<RegexGroupDefinition> RegexGroups
+    {
+        get => _regexGroups;
+        set
+        {
+            _regexGroups = value;
+            CurrentSettings.RegexGroups = value.ToList();
+            this.RaisePropertyChanged();
+            _regexGroups.CollectionChanged += RegexGroupChanged;
+        }
+    }
+    public RegexGroupDefinition? SelectedRegexGroup { get; set; }
+
+    private void RegexGroupChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        CurrentSettings.RegexGroups = _regexGroups.ToList();
+    }
+
 
     public SettingsViewModel()
     {
@@ -33,6 +83,8 @@ public class SettingsViewModel : ViewModelBase
         CustomFileLoggerCommand = ReactiveCommand.Create(CustomFileLoggerPreset);
         LightModeCommand = ReactiveCommand.Create(LightModeChecked);
         DarkModeCommand = ReactiveCommand.Create(DarkModeChecked);
+        AddNewRegexGroupCommand = ReactiveCommand.Create(AddNewRegexGroup);
+        DeleteSelectedRegexGroupCommand = ReactiveCommand.Create(DeleteSelectedRegexGroup);
     }
 
     public void ReloadSettings()
@@ -55,10 +107,20 @@ public class SettingsViewModel : ViewModelBase
         AppState.Retrieve().SetMainView();
     }
 
+    private void AddNewRegexGroup()
+    {
+        RegexGroups.Add(new RegexGroupDefinition());
+    }
+
+    private void DeleteSelectedRegexGroup()
+    {
+        if (SelectedRegexGroup is not null)
+            RegexGroups.Remove(SelectedRegexGroup);
+    }
+
     private void CustomFileLoggerPreset()
     {
-        CurrentSettings.LookupRegex = @"\[(.+?)\]\s*(\w+)\s*(.)(\s+)(.*?)(?=\r?\n\[)";
-        this.RaisePropertyChanged(nameof(CurrentSettings));
+        LookupRegex = @"\[(.+?)\]\s*(\w+)\s*(.)(\s+)(.*?)(?=\r?\n\[)";
     }
 
     private void SaveSettings()
