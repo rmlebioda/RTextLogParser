@@ -25,6 +25,8 @@ public class SettingsViewModel : ViewModelBase
     public string RegexGroupsTitle { get; init; } = "Regular expression groups definition";
     public string AddRegexGroupText { get; init; } = "Add new group";
     public string DeleteSelectedRegexGroupText { get; init; } = "Delete selected group";
+    public string ScopeDetectionText { get; init; } = "Scope detection, group ID:";
+    public string IndentEvaluationText { get; init; } = "Indentation C# evaluation code (input variable is called `Input`, example: `Input.Count(c => c == ' ')`):";
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
     public ReactiveCommand<Unit, Unit> CustomFileLoggerCommand { get; }
@@ -75,6 +77,26 @@ public class SettingsViewModel : ViewModelBase
         CurrentSettings.RegexGroups = _regexGroups.ToList();
     }
 
+    public long IndentGroupId
+    {
+        get => CurrentSettings.IndentGroupId;
+        set
+        {
+            CurrentSettings.IndentGroupId = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
+    public string IndentLevelEvaluation
+    {
+        get => CurrentSettings.IndentLevelEvaluation;
+        set
+        {
+            CurrentSettings.IndentLevelEvaluation = value;
+            this.RaisePropertyChanged();
+        }
+    }
+
 
     public SettingsViewModel()
     {
@@ -121,6 +143,35 @@ public class SettingsViewModel : ViewModelBase
     private void CustomFileLoggerPreset()
     {
         LookupRegex = @"\[(.+?)\]\s*(\w+)\s*(.)(\s+)(.*?)(?=\r?\n\[)";
+        RegexGroups = new ObservableCollection<RegexGroupDefinition>()
+        {
+            new()
+            {
+                FieldIndex = 0,
+                GroupTitle = "Date",
+                IsEnabled = true
+            },
+            new()
+            {
+                FieldIndex = 1,
+                GroupTitle = "Error level",
+                IsEnabled = true
+            },
+            new()
+            {
+                FieldIndex = 2,
+                GroupTitle = "Indents",
+                IsEnabled = true
+            },
+            new()
+            {
+                FieldIndex = 3,
+                GroupTitle = "Details",
+                IsEnabled = true
+            }
+        };
+        IndentGroupId = 2;
+        IndentLevelEvaluation = "Input.Count(c => c == ' ')/2";
     }
 
     private void SaveSettings()
