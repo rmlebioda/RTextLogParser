@@ -10,6 +10,7 @@
         <entry key="RTextLogParser.Gui/Views/MainWindow.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
         <entry key="RTextLogParser.Gui/Views/SettingsView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
         <entry key="RTextLogParser.Gui/Views/SingularLogView.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
+        <entry key="RTextLogParser.Gui/Views/TestIndentEvaluation/TestIndentEvaluationWindow.axaml" value="RTextLogParser.Gui/RTextLogParser.Gui.csproj" />
       </map>
     </option>
   </component>

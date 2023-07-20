@@ -3,16 +3,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:RTextLogParser.Gui.ViewModels"
-             xmlns:v="using:RTextLogParser.Gui.Views"
              xmlns:dataPersistence="clr-namespace:RTextLogParser.Gui.DataPersistence"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:models="clr-namespace:RTextLogParser.Gui.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="RTextLogParser.Gui.Views.SettingsView">
 
     <Design.DataContext>
         <vm:SettingsViewModel />
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, *" Margin="10">
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, 2*, 3*" Margin="10">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto, Auto">
             <Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, Auto">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ThemeText}" VerticalAlignment="Center"
@@ -47,14 +47,16 @@
 
         <Grid Grid.Row="3" Margin="0 5 0 0">
             <Grid ColumnDefinitions="Auto, Auto">
-                <TextBlock Grid.Column="0" Text="{Binding ScopeDetectionText}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="0" Text="{Binding ScopeDetectionText}" VerticalAlignment="Center" />
                 <TextBox Grid.Column="1" Text="{Binding IndentGroupId}" Margin="10 0 0 0" />
             </Grid>
         </Grid>
-        
+
         <Grid Grid.Row="4" Margin="0 5 0 0">
             <Grid RowDefinitions="Auto, Auto">
-                <TextBlock Grid.Row="0" Text="{Binding IndentEvaluationText}" VerticalAlignment="Center"/>
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <TextBlock Grid.Row="0" Text="{Binding IndentEvaluationText}" VerticalAlignment="Center" />
+                </Grid>
                 <TextBox Grid.Row="1" Text="{Binding IndentLevelEvaluation}" Margin="0 5 0 0" />
             </Grid>
         </Grid>
@@ -83,6 +85,25 @@
                                         IsReadOnly="False" />
                 </DataGrid.Columns>
             </DataGrid>
+        </Grid>
+
+        <Grid Grid.Row="7">
+            <Grid Grid.RowDefinitions="Auto, Auto, Auto">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <TextBlock Grid.Row="0" Text="{Binding TestExampleInputText}" />
+                    <Button Grid.Column="2" Content="{Binding IndentEvaluationTestButtonText}"
+                            Command="{Binding IndentEvaluationTestCommand}" />
+                </Grid>
+                <TextBox Grid.Row="1" Text="{Binding TestExampleInput}" />
+                <DataGrid Grid.Row="2" Items="{Binding TestInputResults}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Type" Binding="{Binding (models:TestInputResult).Type}" Width="Auto"/>
+                        <DataGridTextColumn Header="Field" Binding="{Binding (models:TestInputResult).Field}" Width="Auto"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding (models:TestInputResult).Status}" Width="Auto"/>
+                        <DataGridTextColumn Header="Description" Binding="{Binding (models:TestInputResult).Description}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

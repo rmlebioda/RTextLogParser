@@ -11,7 +11,7 @@ public class SingularLogViewModel : ViewModelBase
     public SingularLogViewModel()
     {
         _logElement = new LogElement($"Test log{Environment.NewLine}Second line of log",
-            new string[] { "first group" });
+            new string[] { "first group" }, 1);
     }
 
     public SingularLogViewModel(LogElement logElement)

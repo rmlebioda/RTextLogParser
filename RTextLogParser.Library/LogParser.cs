@@ -2,6 +2,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
+using RTextLogParser.Library.Core;
 using RTextLogParser.Library.Exceptions;
 using RTextLogParser.Library.Utils;
 
@@ -14,37 +17,70 @@ public class LogParser
 {
     private const int BufferSize = 4096;
 
-    private List<LogElement> _listOfSingularLogs = new List<LogElement>();
+    private List<LogElement> _listOfSingularLogs = new();
     private Regex _logRegex;
     private Regex? _lastLogRegex;
-    private string _logPath;
+    private string? _logPath;
     private FileStream? _logFileStream;
-    private StringBuilder _readStringBuffer = new StringBuilder();
+    private Stream? _logStream;
+    private StringBuilder _readStringBuffer = new();
     private readonly byte[] _buffer = new byte[BufferSize];
-    private Encoding? _fileEncoding;
+    private Encoding? _encoding;
     private int _returnedLogLines;
     private bool _didEncounterEoF;
+    private IndentEvaluationSettings? _indentEvaluationSettings;
+    private Script<long>? _evaluationScript;
 
+    private const long IndentNotAvailableValue = -1;
+    
     /// <summary>
     /// Initializes class for reading.
     /// </summary>
     /// <param name="logPath">Path to log file</param>
     /// <param name="logRegex">Regex matching singular log</param>
-    public LogParser(string logPath, Regex logRegex, Regex? lastLogRegex = null)
+    public LogParser(string logPath, Regex logRegex, IndentEvaluationSettings? indentEvaluationSettings = null, Regex? lastLogRegex = null)
     {
         _logRegex = logRegex;
         _logPath = logPath;
         _lastLogRegex = lastLogRegex;
+        _indentEvaluationSettings = indentEvaluationSettings;
+        InitEvaluationScript();
+    }
+
+    public LogParser(Stream logStream, Regex logRegex, IndentEvaluationSettings? indentEvaluationSettings = null, Regex? lastLogRegex = null, Encoding? encoding = null)
+    {
+        _logStream = logStream;
+        _logRegex = logRegex;
+        _lastLogRegex = lastLogRegex;
+        _indentEvaluationSettings = indentEvaluationSettings;
+        _encoding = encoding ?? Encoding.UTF8;
+        InitEvaluationScript();
+    }
+
+    private void InitEvaluationScript()
+    {
+        if (_indentEvaluationSettings is null)
+            return;
+
+        _evaluationScript = CSharpScript
+            .Create<long>(_indentEvaluationSettings!.EvaluationString, globalsType: typeof(InputScript))
+            .WithOptions(ScriptOptions.Default.WithReferences(typeof(System.Linq.Enumerable).Assembly));
+            // .WithOptions(ScriptOptions.Default.WithImports("System.Linq"));
+        _evaluationScript.Compile();
     }
 
     private void EnsureFileIsOpened()
     {
-        _fileEncoding ??= EncodingUtils.GetEncoding(_logPath);
+        if (_logPath is null)
+            return;;
+        
+        _encoding ??= EncodingUtils.GetEncoding(_logPath);
         _logFileStream ??= new FileStream(_logPath, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize,
             FileOptions.Asynchronous);
+        _logStream = _logFileStream;
     }
 
-    private void FindLogsInBuffer(bool useLastLogRegex = false)
+    private async Task FindLogsInBuffer(bool useLastLogRegex = false)
     {
         int? lastCharacterOfAnyMatches = null;
         var buffer = _readStringBuffer.ToString();
@@ -59,9 +95,10 @@ public class LogParser
                 if ((lastCharacterOfAnyMatches - thisMatchStartIndex) > match.Value.Length)
                     throw new InvalidRegexException(
                         $"Matched string length was smaller, than last matched group. This can happen, if you do capturing group inside lookaheads. Please rewrite regex, so that no matching group is inside lookaheads. Matched string: '{match.Value}', matched last group: '{match.Groups[match.Groups.Count - 1].Value}' at position {lastMatchGroup.Index}.");
-                var value = match.Value.Substring(0, lastCharacterOfAnyMatches.Value - thisMatchStartIndex);
-                _listOfSingularLogs.Add(new LogElement(value,
-                    match.Groups.Cast<Group>().Skip(1).Select(group => group.Value)));
+                var logValue = match.Value.Substring(0, lastCharacterOfAnyMatches.Value - thisMatchStartIndex);
+                var groups = match.Groups.Cast<Group>().Skip(1).Select(group => group.Value).ToArray();
+                var indents = await EvaluateIndents(groups);
+                _listOfSingularLogs.Add(new LogElement(logValue, groups, indents));
             }
         }
 
@@ -80,17 +117,17 @@ public class LogParser
         var lastReadBytesCount = -1;
         do
         {
-            lastReadBytesCount = await _logFileStream!.ReadAsync(_buffer);
+            lastReadBytesCount = await _logStream!.ReadAsync(_buffer);
             _readStringBuffer.Append(lastReadBytesCount == BufferSize
-                ? _fileEncoding!.GetString(_buffer)
-                : _fileEncoding!.GetString(_buffer.AsSpan(0, lastReadBytesCount)));
-            FindLogsInBuffer();
+                ? _encoding!.GetString(_buffer)
+                : _encoding!.GetString(_buffer.AsSpan(0, lastReadBytesCount)));
+            await FindLogsInBuffer();
         } while (cancellationToken?.IsCancellationRequested != true &&
                  (!firstMatchOnly || _listOfSingularLogs.Count == startLogsCount) && lastReadBytesCount != 0);
 
         if (lastReadBytesCount == 0 && _readStringBuffer.Length > 0)
         {
-            FindLogsInBuffer(true);
+            await FindLogsInBuffer(true);
             _didEncounterEoF = true;
         }
     }
@@ -152,5 +189,17 @@ public class LogParser
             if (cancellationToken?.IsCancellationRequested == true)
                 break;
         }
+    }
+
+    private async Task<long> EvaluateIndents(string[] groups)
+    {
+        if (_indentEvaluationSettings is null || _indentEvaluationSettings.GroupId > groups.Length)
+            return IndentNotAvailableValue;
+
+        // return await CSharpScript.EvaluateAsync<long>(
+        //     "var Input=\"" + groups[_indentEvaluationSettings.GroupId] + "\";" + _indentEvaluationSettings.EvaluationString,
+        //     ScriptOptions.Default.WithImports("System.Linq"));
+        return (await _evaluationScript!.RunAsync(new InputScript
+            { Input = groups[_indentEvaluationSettings.GroupId] })).ReturnValue;
     }
 }

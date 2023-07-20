@@ -2,12 +2,14 @@ namespace RTextLogParser.Library;
 
 public class LogElement
 {
-    public string Log { get; set; }
-    public string[] RegexGroups { get; set; }
+    public string Log { get; init; }
+    public string[] RegexGroups { get; init; }
+    public long Indent { get; init; }
 
-    public LogElement(string log, IEnumerable<string> regexMatchedGroups)
+    public LogElement(string log, string[] regexMatchedGroups, long indent)
     {
         Log = log;
-        RegexGroups = regexMatchedGroups.ToArray();
+        RegexGroups = regexMatchedGroups;
+        Indent = indent;
     }
 }

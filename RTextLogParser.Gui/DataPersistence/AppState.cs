@@ -47,6 +47,7 @@ public class AppState
 
     private MainViewModel? _mainViewModel;
     private MainWindow? _mainWindow;
+    public MainWindow? MainWindow => _mainWindow;
     private SettingsViewModel? _settingsViewModel;
 
     public delegate void CurrentViewModelChange(ViewModelBase? newViewModel);
