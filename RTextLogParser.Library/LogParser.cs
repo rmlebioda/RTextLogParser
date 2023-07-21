@@ -64,8 +64,9 @@ public class LogParser
 
         _evaluationScript = CSharpScript
             .Create<long>(_indentEvaluationSettings!.EvaluationString, globalsType: typeof(InputScript))
-            .WithOptions(ScriptOptions.Default.WithReferences(typeof(System.Linq.Enumerable).Assembly));
-            // .WithOptions(ScriptOptions.Default.WithImports("System.Linq"));
+            .WithOptions(ScriptOptions.Default
+                .WithImports("System.Linq")
+                .AddReferences(typeof(System.Linq.Enumerable).Assembly));
         _evaluationScript.Compile();
     }
 
@@ -196,9 +197,6 @@ public class LogParser
         if (_indentEvaluationSettings is null || _indentEvaluationSettings.GroupId > groups.Length)
             return IndentNotAvailableValue;
 
-        // return await CSharpScript.EvaluateAsync<long>(
-        //     "var Input=\"" + groups[_indentEvaluationSettings.GroupId] + "\";" + _indentEvaluationSettings.EvaluationString,
-        //     ScriptOptions.Default.WithImports("System.Linq"));
         return (await _evaluationScript!.RunAsync(new InputScript
             { Input = groups[_indentEvaluationSettings.GroupId] })).ReturnValue;
     }
