@@ -6,23 +6,51 @@
              xmlns:dataPersistence="clr-namespace:RTextLogParser.Gui.DataPersistence"
              xmlns:models="clr-namespace:RTextLogParser.Gui.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
-             x:Class="RTextLogParser.Gui.Views.SettingsView">
+             x:Class="RTextLogParser.Gui.Views.SettingsView"
+             xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
+             xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+             xmlns:behaviors="clr-namespace:RTextLogParser.Gui.Behaviors"
+             >
 
     <Design.DataContext>
         <vm:SettingsViewModel />
     </Design.DataContext>
+    
+    <UserControl.Styles>
+        <Style Selector="ListBox.RadioButtonListBox">
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBox.RadioButtonListBox ListBoxItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Border Background="Transparent">
+                            <RadioButton Content="{TemplateBinding ContentPresenter.Content}"
+                                         VerticalAlignment="Center"
+                                         IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}" Margin="0 0 10 0"
+                                         Background="Transparent"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Styles>
 
     <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, 2*, 3*" Margin="10">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto, Auto">
-            <Grid Grid.Column="0" ColumnDefinitions="Auto, Auto, Auto">
+            <Grid Grid.Column="0" ColumnDefinitions="Auto, Auto">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ThemeText}" VerticalAlignment="Center"
                            Margin="0 0 10 0" />
-                <RadioButton Grid.Column="1" IsChecked="{Binding !CurrentSettings.DarkMode}"
-                             GroupName="First Group"
-                             Content="{Binding LightText}" Margin="0 0 10 0" Command="{Binding LightModeCommand}" />
-                <RadioButton Grid.Column="2" IsChecked="{Binding CurrentSettings.DarkMode }"
-                             GroupName="First Group"
-                             Content="{Binding DarkText}" Command="{Binding DarkModeCommand}" />
+                <ListBox Grid.Column="1" ItemsSource="{Binding AllThemes}"
+                         SelectedItem="{Binding SelectedTheme}"
+                         Classes="RadioButtonListBox" >
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
             </Grid>
             <Button Grid.Column="2" HorizontalAlignment="Right" Content="{Binding CancelButtonText}"
                     Command="{Binding CancelCommand}" />
@@ -72,7 +100,7 @@
         </Grid>
 
         <Grid Grid.Row="6">
-            <DataGrid Items="{Binding RegexGroups}" SelectedItem="{Binding SelectedRegexGroup}">
+            <DataGrid ItemsSource="{Binding RegexGroups}" SelectedItem="{Binding SelectedRegexGroup}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Group ID"
                                         Binding="{Binding (dataPersistence:RegexGroupDefinition).FieldIndex}"
@@ -89,13 +117,18 @@
 
         <Grid Grid.Row="7">
             <Grid Grid.RowDefinitions="Auto, Auto, *">
-                <Grid ColumnDefinitions="Auto, *, Auto">
+                <Grid ColumnDefinitions="Auto, *, Auto" Margin="0 0 0 5">
                     <TextBlock Grid.Row="0" Text="{Binding TestExampleInputText}" />
                     <Button Grid.Column="2" Content="{Binding IndentEvaluationTestButtonText}"
                             Command="{Binding IndentEvaluationTestCommand}" />
                 </Grid>
                 <TextBox Grid.Row="1" Text="{Binding TestExampleInput}" />
-                <DataGrid Grid.Row="2" Items="{Binding TestInputResults}">
+                <!-- <AvaloniaEdit:TextEditor Grid.Row="1" BorderThickness="1" BorderBrush="Black" Padding="0 5 0 5" CornerRadius="3"> -->
+                <!--     <i:Interaction.Behaviors> -->
+                <!--         <behaviors:DocumentTextBindingBehavior Text="{Binding TestExampleInput, Mode=TwoWay}"/> -->
+                <!--     </i:Interaction.Behaviors> -->
+                <!-- </AvaloniaEdit:TextEditor> -->
+                <DataGrid Grid.Row="2" ItemsSource="{Binding TestInputResults}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Type" Binding="{Binding (models:TestInputResult).Type}" Width="Auto"/>
                         <DataGridTextColumn Header="Field" Binding="{Binding (models:TestInputResult).Field}" Width="Auto"/>

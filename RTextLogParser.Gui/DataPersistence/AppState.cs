@@ -1,7 +1,10 @@
 using System.Linq;
 using System.Runtime.Serialization;
+using Avalonia;
+using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using ReactiveUI;
+using RTextLogParser.Gui.Models;
 using RTextLogParser.Gui.ViewModels;
 using RTextLogParser.Gui.Views;
 
@@ -80,19 +83,20 @@ public class AppState
     {
         Apply(Settings!);
     }
-    
-    public void Apply(Settings settings)
+
+    private void Apply(Settings settings)
     {
         Settings = settings;
-        SetAppMode(settings.DarkMode);
+        SetAppMode(settings.Theme);
     }
 
-    public void SetAppMode(bool dark)
+    public void SetAppMode(ThemeMode theme)
     {
-        var fluentTheme = _app?.Styles.OfType<FluentTheme>().FirstOrDefault();
-        if (fluentTheme is not null)
+        _app!.RequestedThemeVariant = theme switch
         {
-            fluentTheme.Mode = dark ? FluentThemeMode.Dark : FluentThemeMode.Light;
-        }
+            ThemeMode.Dark => ThemeVariant.Dark,
+            ThemeMode.Light => ThemeVariant.Light,
+            _ => ThemeVariant.Default
+        };
     }
 }

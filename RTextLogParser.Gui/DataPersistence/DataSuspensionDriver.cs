@@ -25,7 +25,6 @@ public class DataSuspensionDriver<TAppState> : ISuspensionDriver where TAppState
     {
         Log.Debug("Loading application state");
         var state = BlobCache.UserAccount.GetObject<TAppState>(AppStateKey);
-        Log.Verbose("Loaded state: {State}", JsonConvert.SerializeObject(state));
         return state;
     }
 

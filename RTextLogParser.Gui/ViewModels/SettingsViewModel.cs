@@ -27,6 +27,7 @@ public class SettingsViewModel : ViewModelBase
     public string CustomFileLoggerText { get; init; } = "Custom file logger";
     public string RegexText { get; init; } = "Line detection regular expression:";
     public string ThemeText { get; init; } = "Theme:";
+    public string DefaultText { get; init; } = "Default";
     public string LightText { get; init; } = "Light";
     public string DarkText { get; init; } = "Dark";
     public string RegexGroupsTitle { get; init; } = "Regular expression groups definition";
@@ -39,12 +40,24 @@ public class SettingsViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> CancelCommand { get; }
     public ReactiveCommand<Unit, Unit> CustomFileLoggerCommand { get; }
+    public ReactiveCommand<Unit, Unit> DefaultModeCommand { get; }
     public ReactiveCommand<Unit, Unit> LightModeCommand { get; }
     public ReactiveCommand<Unit, Unit> DarkModeCommand { get; }
     public ReactiveCommand<Unit, Unit> AddNewRegexGroupCommand { get; }
     public ReactiveCommand<Unit, Unit> DeleteSelectedRegexGroupCommand { get; }
     public ReactiveCommand<Unit, Unit> IndentEvaluationTestCommand { get; }
 
+    public ThemeMode[] AllThemes { get; } = (ThemeMode[])Enum.GetValues(typeof(ThemeMode));
+
+    public ThemeMode SelectedTheme
+    {
+        get => CurrentSettings.Theme;
+        set
+        {
+            CurrentSettings.Theme = value;
+            SetAppMode(value);
+        }
+    }
     private Settings _currentSettings { get; set; }
 
     private Settings CurrentSettings
@@ -125,6 +138,7 @@ public class SettingsViewModel : ViewModelBase
         SaveCommand = ReactiveCommand.Create(Save);
         CancelCommand = ReactiveCommand.Create(Cancel);
         CustomFileLoggerCommand = ReactiveCommand.Create(CustomFileLoggerPreset);
+        DefaultModeCommand = ReactiveCommand.Create(DefaultModeChecked);
         LightModeCommand = ReactiveCommand.Create(LightModeChecked);
         DarkModeCommand = ReactiveCommand.Create(DarkModeChecked);
         AddNewRegexGroupCommand = ReactiveCommand.Create(AddNewRegexGroup);
@@ -276,18 +290,22 @@ public class SettingsViewModel : ViewModelBase
         AppState.Retrieve().Settings = CurrentSettings;
     }
 
+    private void DefaultModeChecked()
+    {
+        SetAppMode(ThemeMode.Default);
+    }
     private void LightModeChecked()
     {
-        SetAppMode(dark: false);
+        SetAppMode(ThemeMode.Light);
     }
 
     private void DarkModeChecked()
     {
-        SetAppMode(dark: true);
+        SetAppMode(ThemeMode.Dark);
     }
 
-    private void SetAppMode(bool dark)
+    private void SetAppMode(ThemeMode theme)
     {
-        AppState.Retrieve().SetAppMode(dark);
+        AppState.Retrieve().SetAppMode(theme);
     }
 }

@@ -6,6 +6,7 @@ using Avalonia.ReactiveUI;
 using Newtonsoft.Json;
 using ReactiveUI;
 using RTextLogParser.Gui.DataPersistence;
+using RTextLogParser.Gui.Models;
 using RTextLogParser.Gui.ViewModels;
 using RTextLogParser.Gui.Views;
 using Serilog;
@@ -22,6 +23,7 @@ namespace RTextLogParser.Gui
             var suspensionDriver = DataSuspensionDriver<AppState>.AppStateNewInstance;
             RxApp.SuspensionHost.CreateNewAppState = CreateNewAppState;
             RxApp.SuspensionHost.SetupDefaultSuspendResume(suspensionDriver);
+            // RxApp.SuspensionHost.AppState ??= CreateNewAppState(); 
             RxApp.SuspensionHost.AppState ??= suspensionDriver.LoadState().Wait();
             AvaloniaXamlLoader.Load(this);
         }
@@ -43,13 +45,13 @@ namespace RTextLogParser.Gui
                 desktop.MainWindow = mainWindow;
                 var appState = AppState.Retrieve();
                 appState.SetApp(this);
-                if (appState.Settings?.DarkMode is bool mode)
+                if (appState.Settings?.Theme is { } theme)
                 {
-                    appState.SetAppMode(mode);
+                    appState.SetAppMode(theme);
                 }
                 else
                 {
-                    appState.SetAppMode(Settings.IsDarkModeDefault);
+                    appState.SetAppMode(ThemeMode.Default);
                 }
             }
 

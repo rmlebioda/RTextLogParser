@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using RTextLogParser.Gui.ViewModels;
@@ -13,13 +14,8 @@ public partial class SingularLogView : UserControl
         InitializeComponent();
     }
 
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
-
-    private void LogLabel_OnTapped(object? sender, RoutedEventArgs e)
-    {
-        (this.DataContext as SingularLogViewModel)?.ToggledExpandLog();
-    }
+        private void LogLabel_OnTapped(object? sender, TappedEventArgs e)
+        {
+            (this.DataContext as SingularLogViewModel)?.ToggledExpandLog();
+        }
 }

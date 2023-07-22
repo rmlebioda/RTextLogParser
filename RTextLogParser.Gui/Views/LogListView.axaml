@@ -12,7 +12,7 @@
     </Design.DataContext>
 
     <StackPanel>
-        <ListBox Items="{Binding LogsViewModels}" VirtualizationMode="Simple"
+        <ListBox ItemsSource="{Binding LogsViewModels}"
                  Height="{Binding $parent[StackPanel].Bounds.Height}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
