@@ -86,7 +86,8 @@ public class LogParser
         int? lastCharacterOfAnyMatches = null;
         var buffer = _readStringBuffer.ToString();
         var regex = useLastLogRegex ? _lastLogRegex ?? _logRegex : _logRegex;
-        foreach (Match match in regex.Matches(buffer))
+        var matches = regex.Matches(buffer);
+        foreach (Match match in _didEncounterEoF ? matches : matches.SkipLast(1))
         {
             if (match.Success)
             {

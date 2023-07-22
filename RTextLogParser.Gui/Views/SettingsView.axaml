@@ -125,7 +125,7 @@
                     <Button Grid.Column="2" Content="{Binding IndentEvaluationTestButtonText}"
                             Command="{Binding IndentEvaluationTestCommand}" />
                 </Grid>
-                <TextBox Grid.Row="1" Text="{Binding TestExampleInput}" />
+                <TextBox Grid.Row="1" Text="{Binding TestExampleInput}" MaxHeight="120" />
                 <!-- <AvaloniaEdit:TextEditor Grid.Row="1" BorderThickness="1" BorderBrush="Black" Padding="0 5 0 5" CornerRadius="3"> -->
                 <!--     <i:Interaction.Behaviors> -->
                 <!--         <behaviors:DocumentTextBindingBehavior Text="{Binding TestExampleInput, Mode=TwoWay}"/> -->

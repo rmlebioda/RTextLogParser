@@ -77,7 +77,7 @@ public class MainViewModel : ViewModelBase
     }
 
     public CustomizationPanelViewModel CustomizationPanelViewModel { get; }
-    public HierarchicalTreeDataGridSource<LogElementExtended> TreeDataGridSource { get; private set; }
+    public HierarchicalTreeDataGridSource<LogElementExtended> TreeDataGridSource { get; }
     private CancellationTokenSource? _cancellationTokenSource;
 
     private void CancelLoadingFile()
@@ -107,6 +107,7 @@ public class MainViewModel : ViewModelBase
                 CustomizationPanelViewModel.UpdateFilePath(fileToLoad);
                 // await LogListViewModel.LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
                 await LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
+                Log.Information("Finished loading the file");
             }
             catch (Exception e)
             {
@@ -131,7 +132,7 @@ public class MainViewModel : ViewModelBase
         }
     }
 
-    public ObservableCollection<LogElementExtended> LogsSource { get; set; } = new();
+    private ObservableCollection<LogElementExtended> LogsSource = new();
 
     public async Task LoadFileAsync(string filePath, CancellationToken? cancellationToken = null)
     {
@@ -186,6 +187,8 @@ public class MainViewModel : ViewModelBase
             return LogsSource.LastOrDefault(logElement => logElement.Indent < indent);
         }
     }
+    
+
 
     private void ResetSavedState()
     {
