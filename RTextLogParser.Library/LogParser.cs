@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
@@ -62,6 +61,7 @@ public class LogParser
         if (_indentEvaluationSettings is null)
             return;
 
+        var stopwatch = new Stopwatch();
         _evaluationScript = CSharpScript
             .Create<long>(_indentEvaluationSettings!.EvaluationString, globalsType: typeof(InputScript))
             .WithOptions(ScriptOptions.Default
