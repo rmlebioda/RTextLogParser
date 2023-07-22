@@ -24,6 +24,7 @@
         <PackageReference Include="akavache" Version="9.1.20" />
         <PackageReference Include="Avalonia" Version="11.0.0" />
         <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.0" />
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.0" />
         <PackageReference Include="Avalonia.Desktop" Version="11.0.0" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0" />

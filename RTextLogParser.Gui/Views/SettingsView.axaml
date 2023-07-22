@@ -105,6 +105,9 @@
                     <DataGridTextColumn Header="Group ID"
                                         Binding="{Binding (dataPersistence:RegexGroupDefinition).FieldIndex}"
                                         Width="Auto" IsReadOnly="False" />
+                    <DataGridCheckBoxColumn Header="Expander"
+                                        Binding="{Binding (dataPersistence:RegexGroupDefinition).IsExpanding}"
+                                        Width="Auto" IsReadOnly="False" />
                     <DataGridCheckBoxColumn Header="Enabled"
                                             Binding="{Binding (dataPersistence:RegexGroupDefinition).IsEnabled}"
                                             Width="Auto" IsReadOnly="False" />

@@ -17,8 +17,9 @@
                 <MenuItem x:Name="ResetSavedState" Header="_Help" Command="{Binding ResetSavedStateCommand}" HotKey="Ctrl+Delete"/>
             </MenuItem>
         </Menu>
-        <v:CustomizationPanelView Grid.Row="1" DataContext="{Binding CustomizationPanelViewModel}" Grid.Column="0" />
+        <v:CustomizationPanelView Grid.Row="1" DataContext="{Binding CustomizationPanelViewModel}" Grid.Column="0" Margin="0 0 0 5"/>
 
-        <v:LogListView Grid.Row="2" DataContext="{Binding LogListViewModel}" Grid.Column="0" />
+        <!-- <v:LogListView Grid.Row="2" DataContext="{Binding LogListViewModel}" Grid.Column="0" /> -->
+        <TreeDataGrid Grid.Row="2" Source="{Binding TreeDataGridSource}"/>
     </Grid>
 </UserControl>

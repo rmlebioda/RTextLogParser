@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Models.TreeDataGrid;
 using ReactiveUI;
 using RTextLogParser.Gui.DataPersistence;
 using RTextLogParser.Gui.Models;
 using RTextLogParser.Gui.Views;
+using RTextLogParser.Library;
+using RTextLogParser.Library.Core;
 using Serilog;
 
 namespace RTextLogParser.Gui.ViewModels;
@@ -34,6 +39,7 @@ public class MainViewModel : ViewModelBase
         _windowActions = new MainWindowActions(LoadFileAsync, CancelLoadingFile);
         CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
         ResetSavedStateCommand = ReactiveCommand.Create(ResetSavedState);
+        TreeDataGridSource = CreateTreeDataGridSource();
     }
 
     public MainViewModel(MainWindow mainWindow)
@@ -42,10 +48,36 @@ public class MainViewModel : ViewModelBase
         _windowActions = new MainWindowActions(LoadFileAsync, CancelLoadingFile);
         CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
         ResetSavedStateCommand = ReactiveCommand.Create(ResetSavedState);
+        TreeDataGridSource = CreateTreeDataGridSource();
+    }
+
+    private HierarchicalTreeDataGridSource<LogElementExtended> CreateTreeDataGridSource()
+    {
+        var source = new HierarchicalTreeDataGridSource<LogElementExtended>(LogsSource);
+
+        var regexGroups = AppState.Retrieve().Settings!.RegexGroups;
+        foreach (var column in regexGroups.OrderBy(group => group.FieldIndex))
+        {
+            if (!column.IsEnabled)
+                continue;
+            if (column.IsExpanding)
+            {
+                source.Columns.Add(new HierarchicalExpanderColumn<LogElementExtended>(
+                    new TextColumn<LogElementExtended, string>(column.GroupTitle,
+                        log => log.RegexGroups[column.FieldIndex]), log => log.Children));
+            }
+            else
+            {
+                source.Columns.Add(new TextColumn<LogElementExtended, string>(column.GroupTitle,
+                    log => log.RegexGroups[column.FieldIndex]));
+            }
+        }
+        
+        return source;
     }
 
     public CustomizationPanelViewModel CustomizationPanelViewModel { get; }
-    public LogListViewModel LogListViewModel { get; } = new LogListViewModel();
+    public HierarchicalTreeDataGridSource<LogElementExtended> TreeDataGridSource { get; private set; }
     private CancellationTokenSource? _cancellationTokenSource;
 
     private void CancelLoadingFile()
@@ -73,7 +105,8 @@ public class MainViewModel : ViewModelBase
                 Log.Information("Selected {filesCount} files: {filesArray}",
                     files.Length, string.Join(", ", files));
                 CustomizationPanelViewModel.UpdateFilePath(fileToLoad);
-                await LogListViewModel.LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
+                // await LogListViewModel.LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
+                await LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
             }
             catch (Exception e)
             {
@@ -85,6 +118,72 @@ public class MainViewModel : ViewModelBase
         else
         {
             Log.Information("File was not selected");
+        }
+    }
+
+    public class LogElementExtended : LogElement
+    {
+        public ObservableCollection<LogElementExtended> Children = new();
+        
+        public LogElementExtended(LogElement logElement) :
+            base(logElement.Log, logElement.RegexGroups, logElement.Indent)
+        {
+        }
+    }
+
+    public ObservableCollection<LogElementExtended> LogsSource { get; set; } = new();
+
+    public async Task LoadFileAsync(string filePath, CancellationToken? cancellationToken = null)
+    {
+        LogsSource.Clear();
+        var settings = AppState.Retrieve().Settings!;
+        var evaluationSettings = new IndentEvaluationSettings()
+        {
+            EvaluationString = settings.IndentLevelEvaluation,
+            GroupId = settings.IndentGroupId
+        };
+        var parser = new LogParser(filePath, new Regex(settings.LookupRegex), evaluationSettings);
+        var stopwatch = Stopwatch.StartNew();
+        var pendingLogs = new List<LogElement>();
+        await foreach (var log in parser.GetLogsAsync(cancellationToken))
+        {
+            pendingLogs.Add(log);
+            if (stopwatch.ElapsedMilliseconds > 1000)
+                AddPendingLogs();
+        }
+
+        AddPendingLogs();
+
+        void AddPendingLogs()
+        {
+            Log.Debug("Elapsed {ElapsedMs} ms, adding {Elements} elements",
+                stopwatch!.ElapsedMilliseconds, pendingLogs.Count);
+            stopwatch.Restart();
+            foreach (var log in pendingLogs)
+            {
+                if (LogsSource.Any() && log.Indent > LogsSource.Last().Indent)
+                {
+                    LogsSource.Last().Children.Add(new LogElementExtended(log));
+                }
+                else if (FindLastParentForIndent(log.Indent) is { } logElement)
+                {
+                    logElement.Children.Add(new LogElementExtended(log));
+                }
+                else
+                {
+                    LogsSource.Add(new LogElementExtended(log));
+                }
+            }
+            // this.RaisePropertyChanged(nameof(TreeDataGridSource));
+            // TreeDataGridSource = CreateTreeDataGridSource();
+            pendingLogs.Clear();
+            Log.Debug("Adding took {ElapsedMs} ms", stopwatch!.ElapsedMilliseconds);
+            stopwatch.Restart();
+        }
+
+        LogElementExtended? FindLastParentForIndent(long indent)
+        {
+            return LogsSource.LastOrDefault(logElement => logElement.Indent < indent);
         }
     }
 

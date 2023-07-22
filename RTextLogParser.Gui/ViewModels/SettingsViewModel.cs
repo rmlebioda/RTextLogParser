@@ -254,31 +254,36 @@ public class SettingsViewModel : ViewModelBase
             {
                 FieldIndex = 0,
                 GroupTitle = "Date",
-                IsEnabled = true
+                IsEnabled = true,
+                IsExpanding = true
             },
             new()
             {
                 FieldIndex = 1,
                 GroupTitle = "Error level",
-                IsEnabled = true
+                IsEnabled = true,
+                IsExpanding = false
             },
             new()
             {
                 FieldIndex = 2,
                 GroupTitle = "Separator",
-                IsEnabled = true
+                IsEnabled = true,
+                IsExpanding = false
             },
             new()
             {
                 FieldIndex = 3,
                 GroupTitle = "Indents",
-                IsEnabled = true
+                IsEnabled = true,
+                IsExpanding = false
             },
             new()
             {
                 FieldIndex = 4,
                 GroupTitle = "Details",
-                IsEnabled = true
+                IsEnabled = true,
+                IsExpanding = false
             }
         };
         IndentGroupId = 3;
