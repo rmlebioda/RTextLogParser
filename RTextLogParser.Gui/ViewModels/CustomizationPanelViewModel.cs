@@ -1,6 +1,7 @@
 using System;
 using System.Reactive;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using ReactiveUI;
 using RTextLogParser.Gui.DataPersistence;
@@ -20,7 +21,8 @@ public class CustomizationPanelViewModel : ViewModelBase, IDisposable
         ChosenFileCommand = ReactiveCommand.CreateFromTask(_windowActions.LoadFileAsync);
         ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
         SettingsCommand = ReactiveCommand.Create(RunSettings);
-        StopLoading = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
+        StopLoadingCommand = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
+        CopySelectedFilePathCommand = ReactiveCommand.CreateFromTask(CopySelectedFilePath);
         Initialize();
     }
 
@@ -30,7 +32,8 @@ public class CustomizationPanelViewModel : ViewModelBase, IDisposable
         ChosenFileCommand = ReactiveCommand.CreateFromTask(_windowActions.LoadFileAsync);
         ChosenFileCommand.IsExecuting.ToProperty(this, x => x.IsBusy, out _isBusy);
         SettingsCommand = ReactiveCommand.Create(RunSettings);
-        StopLoading = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
+        StopLoadingCommand = ReactiveCommand.Create(_windowActions.CancelLoadingFile);
+        CopySelectedFilePathCommand = ReactiveCommand.CreateFromTask(CopySelectedFilePath);
         Initialize();
     }
 
@@ -50,10 +53,17 @@ public class CustomizationPanelViewModel : ViewModelBase, IDisposable
         AppState.Retrieve().SetSettingsView();
     }
     
+    private async Task CopySelectedFilePath()
+    {
+        await AppState.Retrieve().MainWindow!.Clipboard!.SetTextAsync(SelectedFile);
+    }
+    
     public string ChooseLogFileText => "Choose log file";
+    public string CopyText => "Copy";
     public ReactiveCommand<Unit, Unit> ChosenFileCommand { get; }
     public ReactiveCommand<Unit, Unit> SettingsCommand { get; }
-    public ReactiveCommand<Unit, Unit> StopLoading { get; }
+    public ReactiveCommand<Unit, Unit> StopLoadingCommand { get; }
+    public ReactiveCommand<Unit, Unit> CopySelectedFilePathCommand { get; }
     
     private string _selectedFile = string.Empty;
 

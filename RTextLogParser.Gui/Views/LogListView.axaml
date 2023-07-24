@@ -14,6 +14,11 @@
 
     <ListBox ItemsSource="{Binding LogsViewModels}"
              Height="{Binding $parent[StackPanel].Bounds.Height}">
+        <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel Orientation="Vertical"/>
+            </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <v:SingularLogView />
