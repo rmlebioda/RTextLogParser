@@ -9,17 +9,16 @@
              x:Class="RTextLogParser.Gui.Views.SettingsView"
              xmlns:AvaloniaEdit="clr-namespace:AvaloniaEdit;assembly=AvaloniaEdit"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
-             xmlns:behaviors="clr-namespace:RTextLogParser.Gui.Behaviors"
-             >
+             xmlns:behaviors="clr-namespace:RTextLogParser.Gui.Behaviors">
 
     <Design.DataContext>
         <vm:SettingsViewModel />
     </Design.DataContext>
-    
+
     <UserControl.Styles>
         <Style Selector="ListBox.RadioButtonListBox">
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
         <Style Selector="ListBox.RadioButtonListBox ListBoxItem">
             <Setter Property="Template">
@@ -28,8 +27,9 @@
                         <Border Background="Transparent">
                             <RadioButton Content="{TemplateBinding ContentPresenter.Content}"
                                          VerticalAlignment="Center"
-                                         IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}" Margin="0 0 10 0"
-                                         Background="Transparent"/>
+                                         IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}"
+                                         Margin="0 0 10 0"
+                                         Background="Transparent" />
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -37,17 +37,17 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, 2*, 3*" Margin="10">
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto, Auto, Auto, Auto, 2*, 3*" Margin="10">
         <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto, Auto">
             <Grid Grid.Column="0" ColumnDefinitions="Auto, Auto">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ThemeText}" VerticalAlignment="Center"
                            Margin="0 0 10 0" />
                 <ListBox Grid.Column="1" ItemsSource="{Binding AllThemes}"
                          SelectedItem="{Binding SelectedTheme}"
-                         Classes="RadioButtonListBox" >
+                         Classes="RadioButtonListBox">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal"/>
+                            <StackPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                 </ListBox>
@@ -59,6 +59,22 @@
         </Grid>
 
         <Grid Grid.Row="1">
+            <Grid ColumnDefinitions="Auto, Auto, *">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding ListTypeText}" VerticalAlignment="Center"
+                           Margin="0 0 10 0" />
+                <ListBox Grid.Column="1" ItemsSource="{Binding AllListTypes}"
+                         SelectedItem="{Binding SelectedListType}"
+                         Classes="RadioButtonListBox">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2">
             <Grid ColumnDefinitions="Auto, Auto">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding PresetsText}" VerticalAlignment="Center" />
                 <Button Grid.Row="0" Grid.Column="1" Content="{Binding CustomFileLoggerText}" Margin="10 0 0 0"
@@ -66,21 +82,21 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <Grid ColumnDefinitions="Auto, *">
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding RegexText}" VerticalAlignment="Center" />
                 <TextBox Grid.Column="1" Text="{Binding LookupRegex}" Margin="10 0 0 0" />
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="3" Margin="0 5 0 0">
+        <Grid Grid.Row="4" Margin="0 5 0 0">
             <Grid ColumnDefinitions="Auto, Auto">
                 <TextBlock Grid.Column="0" Text="{Binding ScopeDetectionText}" VerticalAlignment="Center" />
                 <TextBox Grid.Column="1" Text="{Binding IndentGroupId}" Margin="10 0 0 0" />
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="4" Margin="0 5 0 0">
+        <Grid Grid.Row="5" Margin="0 5 0 0">
             <Grid RowDefinitions="Auto, Auto">
                 <Grid ColumnDefinitions="Auto, *, Auto">
                     <TextBlock Grid.Row="0" Text="{Binding IndentEvaluationText}" VerticalAlignment="Center" />
@@ -89,7 +105,7 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="5" Margin="0 10 0 0">
+        <Grid Grid.Row="6" Margin="0 10 0 0">
             <Grid ColumnDefinitions="Auto, *, Auto, Auto">
                 <TextBlock Grid.Column="0" Text="{Binding RegexGroupsTitle}" />
                 <Button Grid.Column="2" HorizontalAlignment="Right" Content="{Binding DeleteSelectedRegexGroupText}"
@@ -99,15 +115,15 @@
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="6">
+        <Grid Grid.Row="7">
             <DataGrid ItemsSource="{Binding RegexGroups}" SelectedItem="{Binding SelectedRegexGroup}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Group ID"
                                         Binding="{Binding (dataPersistence:RegexGroupDefinition).FieldIndex}"
                                         Width="Auto" IsReadOnly="False" />
                     <DataGridCheckBoxColumn Header="Expander"
-                                        Binding="{Binding (dataPersistence:RegexGroupDefinition).IsExpanding}"
-                                        Width="Auto" IsReadOnly="False" />
+                                            Binding="{Binding (dataPersistence:RegexGroupDefinition).IsExpanding}"
+                                            Width="Auto" IsReadOnly="False" />
                     <DataGridCheckBoxColumn Header="Enabled"
                                             Binding="{Binding (dataPersistence:RegexGroupDefinition).IsEnabled}"
                                             Width="Auto" IsReadOnly="False" />
@@ -118,7 +134,7 @@
             </DataGrid>
         </Grid>
 
-        <Grid Grid.Row="7">
+        <Grid Grid.Row="8">
             <Grid Grid.RowDefinitions="Auto, Auto, *">
                 <Grid ColumnDefinitions="Auto, *, Auto" Margin="0 0 0 5">
                     <TextBlock Grid.Row="0" Text="{Binding TestExampleInputText}" />
@@ -133,10 +149,14 @@
                 <!-- </AvaloniaEdit:TextEditor> -->
                 <DataGrid Grid.Row="2" ItemsSource="{Binding TestInputResults}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Type" Binding="{Binding (models:TestInputResult).Type}" Width="Auto"/>
-                        <DataGridTextColumn Header="Field" Binding="{Binding (models:TestInputResult).Field}" Width="Auto"/>
-                        <DataGridTextColumn Header="Status" Binding="{Binding (models:TestInputResult).Status}" Width="Auto"/>
-                        <DataGridTextColumn Header="Description" Binding="{Binding (models:TestInputResult).Description}" Width="*"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding (models:TestInputResult).Type}"
+                                            Width="Auto" />
+                        <DataGridTextColumn Header="Field" Binding="{Binding (models:TestInputResult).Field}"
+                                            Width="Auto" />
+                        <DataGridTextColumn Header="Status" Binding="{Binding (models:TestInputResult).Status}"
+                                            Width="Auto" />
+                        <DataGridTextColumn Header="Description"
+                                            Binding="{Binding (models:TestInputResult).Description}" Width="*" />
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

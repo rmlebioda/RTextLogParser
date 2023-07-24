@@ -17,9 +17,14 @@ public class LogListViewModel : ViewModelBase
 {
     public ObservableCollection<SingularLogViewModel> LogsViewModels { get; } = new();
 
-    public async Task LoadFileAsync(string filePath, CancellationToken? cancellationToken = null)
+    public void ClearList()
     {
         LogsViewModels.Clear();
+    }
+    
+    public async Task LoadFileAsync(string filePath, CancellationToken? cancellationToken = null)
+    {
+        ClearList();
         var settings = AppState.Retrieve().Settings!;
         var evaluationSettings = new IndentEvaluationSettings()
         {

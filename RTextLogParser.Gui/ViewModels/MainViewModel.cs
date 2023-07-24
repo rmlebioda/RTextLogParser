@@ -19,12 +19,31 @@ using Serilog;
 
 namespace RTextLogParser.Gui.ViewModels;
 
-public class MainViewModel : ViewModelBase
+public class MainViewModel : ViewModelBase, IDisposable
 {
     private readonly MainWindow _mainWindow;
     private readonly MainWindowActions _windowActions;
 
     public ReactiveCommand<Unit, Unit> ResetSavedStateCommand { get; }
+
+    public ListType? SelectedListType
+    {
+        get => _selectedListType;
+        set
+        {
+            if (_selectedListType != value)
+            {
+                LogsSource.Clear();
+                LogListViewModel.ClearList();
+            }
+            _selectedListType = value;
+            this.RaisePropertyChanged(nameof(IsListTypeListBox));
+            this.RaisePropertyChanged(nameof(IsListTypeTreeDataGrid));
+        }
+    }
+
+    public bool IsListTypeListBox => SelectedListType == ListType.ListBox;
+    public bool IsListTypeTreeDataGrid => SelectedListType == ListType.TreeDataGrid;
     
     [Obsolete("Do not call, to be used only by designer")]
     /// <summary>
@@ -40,6 +59,7 @@ public class MainViewModel : ViewModelBase
         CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
         ResetSavedStateCommand = ReactiveCommand.Create(ResetSavedState);
         TreeDataGridSource = CreateTreeDataGridSource();
+        Initialize();
     }
 
     public MainViewModel(MainWindow mainWindow)
@@ -49,6 +69,23 @@ public class MainViewModel : ViewModelBase
         CustomizationPanelViewModel = new CustomizationPanelViewModel(_windowActions);
         ResetSavedStateCommand = ReactiveCommand.Create(ResetSavedState);
         TreeDataGridSource = CreateTreeDataGridSource();
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        AppState.Retrieve().SettingsChanged += SettingsChanged;
+        SettingsChanged(AppState.Retrieve().Settings);
+    }
+    
+    public void Dispose()
+    {
+        AppState.Retrieve().SettingsChanged -= SettingsChanged;
+    }
+    
+    private void SettingsChanged(Settings? settings)
+    {
+        SelectedListType = settings?.ListType;
     }
 
     private HierarchicalTreeDataGridSource<LogElementExtended> CreateTreeDataGridSource()
@@ -77,6 +114,7 @@ public class MainViewModel : ViewModelBase
     }
 
     public CustomizationPanelViewModel CustomizationPanelViewModel { get; }
+    public LogListViewModel LogListViewModel { get; } = new LogListViewModel();
     public HierarchicalTreeDataGridSource<LogElementExtended> TreeDataGridSource { get; }
     private CancellationTokenSource? _cancellationTokenSource;
 
@@ -105,8 +143,14 @@ public class MainViewModel : ViewModelBase
                 Log.Information("Selected {filesCount} files: {filesArray}",
                     files.Length, string.Join(", ", files));
                 CustomizationPanelViewModel.UpdateFilePath(fileToLoad);
-                // await LogListViewModel.LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
-                await LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
+                if (AppState.Retrieve().Settings!.ListType == ListType.TreeDataGrid)
+                {
+                    await LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
+                }
+                else
+                {
+                    await LogListViewModel.LoadFileAsync(fileToLoad, _cancellationTokenSource.Token);
+                }
                 Log.Information("Finished loading the file");
             }
             catch (Exception e)
@@ -133,6 +177,7 @@ public class MainViewModel : ViewModelBase
     }
 
     private ObservableCollection<LogElementExtended> LogsSource = new();
+    private ListType? _selectedListType;
 
     public async Task LoadFileAsync(string filePath, CancellationToken? cancellationToken = null)
     {
@@ -175,8 +220,6 @@ public class MainViewModel : ViewModelBase
                     LogsSource.Add(new LogElementExtended(log));
                 }
             }
-            // this.RaisePropertyChanged(nameof(TreeDataGridSource));
-            // TreeDataGridSource = CreateTreeDataGridSource();
             pendingLogs.Clear();
             Log.Debug("Adding took {ElapsedMs} ms", stopwatch!.ElapsedMilliseconds);
             stopwatch.Restart();

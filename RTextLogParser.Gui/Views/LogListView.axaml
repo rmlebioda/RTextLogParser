@@ -5,20 +5,19 @@
              xmlns:vm="using:RTextLogParser.Gui.ViewModels"
              xmlns:v="using:RTextLogParser.Gui.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="RTextLogParser.Gui.Views.LogListView">
+             x:Class="RTextLogParser.Gui.Views.LogListView"
+             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
     <Design.DataContext>
         <vm:LogListViewModel />
     </Design.DataContext>
 
-    <StackPanel>
-        <ListBox ItemsSource="{Binding LogsViewModels}"
-                 Height="{Binding $parent[StackPanel].Bounds.Height}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <v:SingularLogView />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </StackPanel>
+    <ListBox ItemsSource="{Binding LogsViewModels}"
+             Height="{Binding $parent[StackPanel].Bounds.Height}">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <v:SingularLogView />
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
 </UserControl>

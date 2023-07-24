@@ -30,6 +30,7 @@ public class SettingsViewModel : ViewModelBase
     public string DefaultText { get; init; } = "Default";
     public string LightText { get; init; } = "Light";
     public string DarkText { get; init; } = "Dark";
+    public string ListTypeText { get; init; } = "List type:";
     public string RegexGroupsTitle { get; init; } = "Regular expression groups definition";
     public string AddRegexGroupText { get; init; } = "Add new group";
     public string DeleteSelectedRegexGroupText { get; init; } = "Delete selected group";
@@ -48,7 +49,6 @@ public class SettingsViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> IndentEvaluationTestCommand { get; }
 
     public ThemeMode[] AllThemes { get; } = (ThemeMode[])Enum.GetValues(typeof(ThemeMode));
-
     public ThemeMode SelectedTheme
     {
         get => CurrentSettings.Theme;
@@ -58,6 +58,16 @@ public class SettingsViewModel : ViewModelBase
             SetAppMode(value);
         }
     }
+    public ListType[] AllListTypes { get; } = (ListType[])Enum.GetValues(typeof(ListType));
+    public ListType SelectedListType
+    {
+        get => CurrentSettings.ListType;
+        set
+        {
+            CurrentSettings.ListType = value;
+        }
+    }
+    
     private Settings _currentSettings { get; set; }
 
     private Settings CurrentSettings
