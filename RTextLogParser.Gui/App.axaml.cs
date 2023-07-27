@@ -23,8 +23,7 @@ namespace RTextLogParser.Gui
             var suspensionDriver = DataSuspensionDriver<AppState>.AppStateNewInstance;
             RxApp.SuspensionHost.CreateNewAppState = CreateNewAppState;
             RxApp.SuspensionHost.SetupDefaultSuspendResume(suspensionDriver);
-            // RxApp.SuspensionHost.AppState ??= CreateNewAppState(); 
-            RxApp.SuspensionHost.AppState ??= suspensionDriver.LoadState().Wait();
+            RxApp.SuspensionHost.AppState ??= LoadAppState(suspensionDriver);
             AvaloniaXamlLoader.Load(this);
         }
 
@@ -32,6 +31,18 @@ namespace RTextLogParser.Gui
         {
             Log.Information("Creating new app state");
             return new AppState();
+        }
+
+        private object LoadAppState(DataSuspensionDriver<AppState> suspensionDriver)
+        {
+            try
+            {
+                return suspensionDriver.LoadState().Wait();
+            }
+            catch (System.Collections.Generic.KeyNotFoundException)
+            {
+                return CreateNewAppState();
+            }
         }
 
         public override void OnFrameworkInitializationCompleted()
