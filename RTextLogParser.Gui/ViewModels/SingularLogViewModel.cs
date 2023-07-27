@@ -6,7 +6,24 @@ namespace RTextLogParser.Gui.ViewModels;
 
 public class SingularLogViewModel : ViewModelBase
 {
-    private LogElement _logElement;
+    private readonly LogElement _logElement;
+    private bool _isExpanded = false;
+    public bool IsHidden { get; set; } = false;
+
+    public bool IsExpanded
+    {
+        get => CanExpand && _isExpanded;
+        set => _isExpanded = value;
+    }
+    
+    public bool IsNotExpanded
+    {
+        get => CanExpand && !_isExpanded;
+        set => _isExpanded = value;
+    }
+
+
+    public bool CanExpand { get; set; } = false;
 
     public SingularLogViewModel()
     {
@@ -18,26 +35,12 @@ public class SingularLogViewModel : ViewModelBase
     {
         _logElement = logElement;
     }
-
-    public void ToggledExpandLog()
+    
+    public SingularLogViewModel(LogElement logElement, bool canExpand)
     {
-        LogMaxLines = _logMaxLines == MaxLinesNonExpanded ? MaxLinesNoLimit : MaxLinesNonExpanded;
+        _logElement = logElement;
+        CanExpand = canExpand;
     }
 
     public string Log => _logElement.Log;
-    private const int MaxLinesNonExpanded = 1;
-    private const int MaxLinesNoLimit = 0;
-    private int _logMaxLines = MaxLinesNonExpanded;
-
-    public int LogMaxLines
-    {
-        get => _logMaxLines;
-        set
-        {
-            this.RaiseAndSetIfChanged(ref _logMaxLines, value);
-            this.RaisePropertyChanged(nameof(IsExpanded));
-        }
-    }
-
-    public bool IsExpanded => LogMaxLines > 1 && LogMaxLines == MaxLinesNonExpanded;
 }

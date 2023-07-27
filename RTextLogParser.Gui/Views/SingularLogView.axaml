@@ -9,19 +9,21 @@
     <Design.DataContext>
         <vm:SingularLogViewModel />
     </Design.DataContext>
-    
+
     <UserControl.Styles>
         <Style Selector="Svg.Expand">
             <!-- <Setter Property="def" Value="White"/> -->
         </Style>
     </UserControl.Styles>
 
-    <Grid ColumnDefinitions="*, 20" VerticalAlignment="Top">
-        <Label Grid.Column="0" Tapped="LogLabel_OnTapped">
-            <TextBlock HorizontalAlignment="Stretch" Text="{Binding Log}" VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis" MaxLines="{Binding LogMaxLines}" />
-        </Label>
-        <Svg Grid.Column="1" Path="/Assets/chevron-up-solid.svg" Classes="Expand" IsVisible="{Binding !IsExpanded}" VerticalAlignment="Top"/>
-        <Svg Grid.Column="1" Path="/Assets/chevron-down-solid.svg" Classes="Expand" IsVisible="{Binding IsExpanded}" VerticalAlignment="Top" />
-    </Grid>
+    <ScrollViewer IsVisible="{Binding !IsHidden}">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Width="100">
+                <Svg Grid.Column="1" Path="/Assets/chevron-up-solid.svg" Classes="Expand"
+                     IsVisible="{Binding !IsExpanded}" VerticalAlignment="Top" />
+                <Svg Grid.Column="1" Path="/Assets/chevron-down-solid.svg" Classes="Expand"
+                     IsVisible="{Binding IsExpanded}" VerticalAlignment="Top" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>
